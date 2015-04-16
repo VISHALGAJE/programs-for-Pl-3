@@ -23,7 +23,7 @@ public class Server2 {
     } 
 
     public void stopServer() { 
-	System.out.println( "Server cleaning up." ); 
+	System.out.println( "Server cleaning up." );
 	System.exit(0); 
     } 
 

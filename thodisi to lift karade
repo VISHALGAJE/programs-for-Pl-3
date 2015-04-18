@@ -1,0 +1,181 @@
+Title: Develop an application using Beeglebone Black/ ARM Cortex A5 	development board to simulate the operations of LIFT. 
+
+#!/usr/bin/python 
+
+# Import standard python libraries 
+import os 
+import time 
+
+# Import GPIO part of Adafruit BBIO Library 
+import Adafruit_BBIO.GPIO as GPIO 
+
+
+DIR_LED_1 	= "P9_11" 
+DIR_LED_2 	= "P8_7" 
+DIR_LED_3 	= "P9_12" 
+DIR_LED_4 	= "P8_8" 
+DIR_LED_5 	= "P9_13" 
+DIR_LED_6 	= "P8_9" 
+DIR_LED_7 	= "P9_14" 
+
+POS_LED_0	= "P9_23" 
+POS_LED_1	= "P8_15" 
+POS_LED_2	= "P9_24" 
+POS_LED_3	= "P8_16" 
+
+LIFT_LED_0	= "P9_21" 
+LIFT_LED_1	= "P8_13" 
+LIFT_LED_2	= "P9_22" 
+LIFT_LED_3	= "P8_14" 
+
+BUTTON_0 	= "P9_26" 
+BUTTON_1 	= "P8_17" 
+BUTTON_2 	= "P8_19" 
+BUTTON_3 	= "P8_18" 
+
+
+# An array of DIRECTION LEDS 
+dir_leds = [ 	DIR_LED_1, 
+		DIR_LED_2, 
+		DIR_LED_3, 
+		DIR_LED_4, 
+		DIR_LED_5, 
+		DIR_LED_6, 
+		DIR_LED_7 
+	   ]	 
+
+# An array of POSITION LEDS 
+pos_leds = [ 
+		POS_LED_0, 
+		POS_LED_1, 
+		POS_LED_2, 
+		POS_LED_3 
+	   ] 
+
+# An array of LIFT LEDS 
+lift_leds = [ 
+		LIFT_LED_0, 
+		LIFT_LED_1, 
+		LIFT_LED_2, 
+		LIFT_LED_3 
+	   ] 
+
+# Default position of the Lift  (LED for Ground Floor) 
+DEFAULT_LIFT_POS = POS_LED_0 
+# No of LEDs for showing the lift direction 
+NO_OF_DIR_LEDS	 =	7 
+
+
+def liftLEDOn(pin): 
+	GPIO.setup(pin, GPIO.OUT) 
+	GPIO.output(pin, GPIO.HIGH) 
+	return 
+
+
+	 
+def liftLEDOff(pin): 
+	GPIO.setup(pin, GPIO.OUT) 
+	GPIO.output(pin, GPIO.LOW) 
+	return 
+
+
+def setupButton(pin): 
+	GPIO.setup(pin, GPIO.IN) 
+	GPIO.add_event_detect(pin, GPIO.FALLING) 
+	return 
+
+
+def liftDirUp(): 
+	for i in range(0, NO_OF_DIR_LEDS): 
+		liftLEDOn(dir_leds[i]) 
+		time.sleep(0.5) 
+	for i in range(0, NO_OF_DIR_LEDS): 
+		liftLEDOff(dir_leds[i]) 
+	return 
+
+
+
+def liftDirDown(): 
+	for i in range(NO_OF_DIR_LEDS, 0, -1): 
+		liftLEDOn(dir_leds[i-1]) 
+		time.sleep(0.5) 
+	for i in range(0, NO_OF_DIR_LEDS): 
+		liftLEDOff(dir_leds[i]) 
+	return 
+
+
+
+	 
+def liftInitAll(): 
+	setupButton(BUTTON_0)		# Setup all lift Buttons 
+	setupButton(BUTTON_1) 
+	setupButton(BUTTON_2) 
+	setupButton(BUTTON_3) 
+	 
+	liftLEDOff(DIR_LED_1)		# Initialize all lift LEDs 
+	liftLEDOff(DIR_LED_2) 
+	liftLEDOff(DIR_LED_3) 
+	liftLEDOff(DIR_LED_4) 
+	liftLEDOff(DIR_LED_5) 
+	liftLEDOff(DIR_LED_6) 
+	liftLEDOff(DIR_LED_7) 
+	 
+	liftLEDOff(POS_LED_0)		 
+	liftLEDOff(POS_LED_1) 
+	liftLEDOff(POS_LED_2) 
+	liftLEDOff(POS_LED_3) 
+	 
+	liftLEDOff(LIFT_LED_0) 
+	liftLEDOff(LIFT_LED_1) 
+	liftLEDOff(LIFT_LED_2) 
+	liftLEDOff(LIFT_LED_3) 
+	 
+	liftLEDOn(DEFAULT_LIFT_POS)	 
+	return 
+def GetButtonVal(): 
+	while True: 
+		if GPIO.event_detected(BUTTON_0): 
+			liftLEDOn(LIFT_LED_0) 
+			return 0 
+		elif GPIO.event_detected(BUTTON_1): 
+			liftLEDOn(LIFT_LED_1) 
+			return 1 
+		elif GPIO.event_detected(BUTTON_2): 
+			liftLEDOn(LIFT_LED_2) 
+			return 2 
+		elif GPIO.event_detected(BUTTON_3): 
+			liftLEDOn(LIFT_LED_3) 
+			return 3 			 	 
+		 
+liftInitAll()					 
+time.sleep(1)				 
+cur_flr = 0				 
+while True:				 
+	new_flr = GetButtonVal()	 
+	if new_flr > cur_flr:				 
+		tmp = cur_flr					 
+		print "LIFT going UP to floor #%d" %new_flr	 
+		while (tmp != new_flr):				 
+			liftDirUp()				 
+			time.sleep(0.01)			 
+			liftLEDOff(pos_leds[tmp])		 
+			tmp += 1				 
+			liftLEDOn(pos_leds[tmp])		 
+			time.sleep(0.5)				 
+	elif new_flr < cur_flr:				 
+		tmp = cur_flr					 
+		print "LIFT going DOWN to floor #%d" %new_flr	 
+		while (tmp != new_flr):				 
+			liftDirDown()				 
+			time.sleep(0.01)			 
+			liftLEDOff(pos_leds[tmp])		 
+			tmp -= 1				 
+			liftLEDOn(pos_leds[tmp])		 
+			time.sleep(0.5)				 
+	 
+	cur_flr = new_flr		 
+	liftLEDOff(lift_leds[new_flr])	 
+	time.sleep(1)			 
+exit()					 
+ 
+	 

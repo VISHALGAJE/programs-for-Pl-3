@@ -1,0 +1,61 @@
+#!/usr/bin/python 
+# Import standard python libraries
+import sys
+import os
+import time
+
+# Import GPIO part of Adafruit BBIO Library
+import Adafruit_BBIO.GPIO as GPIO
+# Import ADC part of Adafruit BBIO Library
+import Adafruit_BBIO.ADC as ADC
+
+
+SQW_PIN_UPPER   =    "P9_26"
+SQW_PIN_LOWER   =    "P9_21"
+ 		
+
+
+def Sq_wave(pin, val):
+	GPIO.setup(pin, GPIO.OUT)
+	if (val == "1"):
+		GPIO.output(pin, GPIO.HIGH)
+	else:
+		GPIO.output(pin, GPIO.LOW)
+	return
+
+def lightOff(pin):
+	GPIO.setup(pin, GPIO.OUT)
+	GPIO.output(pin, GPIO.LOW)
+	return 
+
+def lightOffAll():
+	lightOff("P9_19")
+	lightOff("P9_23")
+	lightOff("P9_13")
+	lightOff("P9_15")
+	lightOff("P9_17")
+	lightOff("P9_22")
+	lightOff("P9_24")
+	lightOff("P9_14")
+	lightOff("P9_16")
+	lightOff("P9_18")
+	lightOff(SQW_PIN_UPPER)
+	lightOff(SQW_PIN_LOWER)
+	return
+
+
+print "Square Wave Simulation"
+print "------------------------------------"
+lightOffAll()
+while True:
+	print "<----HIGH---> "
+	Sq_wave(SQW_PIN_UPPER,"1")
+	Sq_wave(SQW_PIN_LOWER,"0")
+	time.sleep(5)			#pause
+	print "<----LOW----> "	 
+	Sq_wave(SQW_PIN_UPPER,"0")
+	Sq_wave(SQW_PIN_LOWER,"1")
+	time.sleep(5)			# pause 
+exit()
+
+

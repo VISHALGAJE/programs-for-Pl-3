@@ -1,0 +1,125 @@
+
+
+
+#!/usr/bin/python 
+
+
+# Import standard python libraries 
+import os 
+import time 
+
+# Import GPIO part of Adafruit BBIO Library 
+import Adafruit_BBIO.GPIO as GPIO 
+
+
+###################################################
+# GPIO Pin definitions for Traffic Light Simulation Board 
+###################################################
+NORTH_GREEN	=	"P9_21" 
+NORTH_YELLOW	=	"P9_23" 
+NORTH_RED	=	"P9_26" 
+
+EAST_GREEN	=	"P8_13" 
+EAST_YELLOW	=	"P8_15" 
+EAST_RED	=	"P8_17" 
+
+SOUTH_GREEN	=	"P9_22" 
+SOUTH_YELLOW	=	"P9_24" 
+SOUTH_RED	=	"P8_19" 
+
+WEST_GREEN	=	"P8_14" 
+WEST_YELLOW	=	"P8_16" 
+WEST_RED	=	"P8_18" 
+
+
+
+def lightOn(pin): 
+	GPIO.setup(pin, GPIO.OUT) 
+	GPIO.output(pin, GPIO.HIGH) 
+	return 
+	 
+
+def lightOff(pin): 
+	GPIO.setup(pin, GPIO.OUT) 
+	GPIO.output(pin, GPIO.LOW) 
+	return 
+
+
+
+def northSouthOn(): 
+	lightOff(EAST_YELLOW) 
+	lightOff(WEST_YELLOW) 
+	lightOff(NORTH_RED) 
+	lightOff(SOUTH_RED) 
+
+	lightOn(EAST_RED) 
+	lightOn(WEST_RED) 
+
+	lightOn(NORTH_GREEN) 
+	lightOn(SOUTH_GREEN) 
+
+	time.sleep(10) 
+
+	lightOff(NORTH_GREEN) 
+	lightOff(SOUTH_GREEN) 
+
+	lightOn(NORTH_YELLOW) 
+	lightOn(SOUTH_YELLOW) 
+	time.sleep(1) 
+	return 
+
+
+
+def eastWestOn(): 
+	lightOff(NORTH_YELLOW) 
+	lightOff(SOUTH_YELLOW) 
+	lightOff(EAST_RED) 
+	lightOff(WEST_RED) 
+
+	lightOn(NORTH_RED) 
+	lightOn(SOUTH_RED) 
+
+	lightOn(EAST_GREEN) 
+	lightOn(WEST_GREEN) 
+
+	time.sleep(10) 
+
+	lightOff(EAST_GREEN) 
+	lightOff(WEST_GREEN) 
+
+	lightOn(EAST_YELLOW) 
+	lightOn(WEST_YELLOW) 
+	time.sleep(1) 
+	return 
+
+
+def TurnOffAll(): 
+	lightOff(NORTH_GREEN) 
+	lightOff(NORTH_YELLOW) 
+	lightOff(NORTH_RED) 
+	lightOff(EAST_GREEN) 
+	lightOff(EAST_YELLOW) 
+	lightOff(EAST_RED) 
+	lightOff(SOUTH_GREEN) 
+	lightOff(SOUTH_YELLOW) 
+	lightOff(SOUTH_RED) 
+	lightOff(WEST_GREEN) 
+	lightOff(WEST_YELLOW) 
+	lightOff(WEST_RED) 
+	return 
+	 
+######################## 
+# Program starts here 
+########################	 
+TurnOffAll()					# Initialize all LEDs and Turn them OFF	 
+time.sleep(3)					# Wait for 3 seconds 
+for x in range(0, 10):				# Loop for 10 times 
+	print "\nNORTH-SOUTH	--> [GO]"	# Prints 
+	print "EAST-WEST 	--> [STOP]\n"	# Prints 
+	northSouthOn()				# Call function to make NORTH-SOUTH traffic ON 
+	time.sleep(1)				# Sleep for 1 second 
+	print "\nEAST-WEST	--> [GO]"	# Prints 
+	print "NORTH-SOUTH 	--> [STOP]\n"	# Prints 
+	eastWestOn()				# Call function to make EAST-WEST traffic ON 
+	time.sleep(1)				# Sleep for 1 second 
+exit()						# Once loop is completed; exit the program  			
